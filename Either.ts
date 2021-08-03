@@ -1,10 +1,10 @@
-interface FoldObject<L, R> {
+interface FoldObject<L extends Error, R> {
     onSuccess(val: R): void;
     onFailure(err: L): void;
 }
 
 
-class Either<L, R> {
+class Either<L extends Error, R> {
     constructor(
         private readonly error: L,
         private readonly value: R) {
@@ -23,7 +23,7 @@ class Left<L extends Error, R> extends Either<L, unknown> {
     }
 }
 
-class Right<R> extends Either<unknown, R> {
+class Right<L extends Error, R> extends Either<L, R> {
     constructor(value: R) {
         super(null, value);
     }
@@ -39,28 +39,26 @@ function right<L extends Error, R> (x: R): Either<L, R> {
 }
 
 
-
+// EXAMPLE
+// class MyError extends Error {}
+//
+// function getAll(): Either<MyError, string> {
+//     return right("Hello");
+// }
+//
 // function test() {
 //     const all = getAll();
 //
-//     let output = "";
+//     all.fold(new class implements FoldObject<MyError, string> {
+//         onFailure(err: MyError): void {
+//             console.log(err);
+//         }
 //
-//     all.fold(new class implements FoldObject<Error, string> {
-//         onSuccess(val: string) {
+//         onSuccess(val: string): void {
 //             console.log(val);
-//             output = val;
 //         }
-//         onFailure(err: Error) {
-//             console.error(err)
-//         }
-//     });
-//
-//
-//     console.log("output:", output)
+//     })
 // }
 //
-// function getAll(): Either<Error, string> {
-//     return right("Hello");
-// }
 //
 // test();
